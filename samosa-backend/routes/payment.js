@@ -2,8 +2,9 @@ const express = require("express")
 const router = express.Router()
 const Stripe = require("stripe")
 const Order = require("../models/Order")
+const orderWindow = require("../middleware/orderWindow")
 
-router.post("/create-checkout-session", async (req, res) => {
+router.post("/create-checkout-session", orderWindow, async (req, res) => {
   try {
     const key = process.env.STRIPE_SECRET_KEY
     if (!key) return res.status(500).json({ error: "STRIPE_SECRET_KEY missing" })

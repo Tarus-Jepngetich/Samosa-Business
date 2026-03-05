@@ -1,4 +1,4 @@
-# 🥟 Samosa Business Ordering System
+# Samosa Business Ordering System
 
 An online pre-order system for my small samosa business.
 
@@ -34,7 +34,7 @@ Backend
 
 ---
 
-# 📸 Screenshots
+# Wire-Frames
 
 ## Landing Page
 
@@ -54,7 +54,7 @@ Backend
 
 ---
 
-# 🧑‍🍳 How It Works
+# How It Works
 
 1. Customer selects samosa packs
 2. Payment is processed using Stripe
@@ -64,7 +64,7 @@ Backend
 
 ---
 
-# ⚙️ Installation
+# Installation
 
 Clone the repository
 

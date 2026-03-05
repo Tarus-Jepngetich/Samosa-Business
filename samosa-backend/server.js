@@ -3,6 +3,7 @@ const cors = require("cors")
 const mongoose = require("mongoose")
 require("dotenv").config()
 const ordersRoutes = require("./routes/orders")
+const stripeWebhookRoutes = require("./routes/stripeWebhook")
 
 
 console.log("ENV loaded STRIPE key?", process.env.STRIPE_SECRET_KEY ? "YES" : "NO")
@@ -23,6 +24,8 @@ app.use(express.json())
 app.use("/api/admin", require("./routes/adminAuth"))
 app.use("/api/payment", paymentRoutes)
 app.use("/api/orders", ordersRoutes)
+app.use("/api/webhook", stripeWebhookRoutes) // BEFORE express.json()
+app.use(express.json())
 const PORT = process.env.PORT || 5000
 
 async function startServer() {
