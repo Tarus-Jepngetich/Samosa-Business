@@ -3,7 +3,7 @@ import Container from "../components/layout/container"
 
 export default function Success() {
   const [params] = useSearchParams()
-  const sessionId = params.get("session_id") // Stripe usually appends this
+  const sessionId = params.get("session_id")
 
   return (
     <div className="min-h-screen bg-white">
@@ -49,7 +49,6 @@ export default function Success() {
                     background: "rgba(11,11,12,0.03)",
                   }}
                 >
-                  {/* Check icon */}
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M20 6L9 17l-5-5"
@@ -63,10 +62,11 @@ export default function Success() {
 
                 <div className="flex-1">
                   <h1 className="text-2xl md:text-3xl font-extrabold" style={{ color: "var(--ink)" }}>
-                    Order confirmed 🙂
+                    Order confirmed. Yaaas!
                   </h1>
                   <p className="mt-2 text-sm md:text-base" style={{ color: "var(--ink-soft)" }}>
-                    Thank you for shopping with us. We appreciate your support — your samosas are now booked and will be ready for pickup on Saturday!
+                    Asante sana for shopping with us. We appreciate your support — your samosas are now
+                    booked and will be ready for pickup on Saturday!
                   </p>
                 </div>
               </div>
@@ -79,13 +79,47 @@ export default function Success() {
                 }}
               >
                 <p className="text-xs font-semibold" style={{ color: "var(--ink-soft)" }}>
-                  Pickup details
+                  Pickup Instructions
                 </p>
-                <p className="mt-1 text-lg font-extrabold" style={{ color: "var(--ink)" }}>
+
+                <p className="mt-2 text-lg font-extrabold" style={{ color: "var(--ink)" }}>
                   Saturday, 12:00 – 4:00pm
                 </p>
-                <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>
-                  Pickup only (no delivery). If you prefer delivery, you may arrange and cover the Uber delivery fee and we’ll hand the order to the driver.
+
+                <ul className="mt-4 list-disc pl-5 text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
+                  <li>
+                    <span className="font-semibold" style={{ color: "var(--ink)" }}>
+                      Address:
+                    </span>{" "}
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=2A+Franke+Ct+Kingston+4114"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline underline-offset-4 font-semibold"
+                      style={{ color: "var(--ink)" }}
+                    >
+                      2A Franke Ct Kingston 4114
+                    </a>
+                  </li>
+
+                  <li>
+                    <span className="font-semibold" style={{ color: "var(--ink)" }}>
+                      Bring:
+                    </span>{" "}
+                    Identification
+                  </li>
+
+                  <li>
+                    <span className="font-semibold" style={{ color: "var(--ink)" }}>
+                      Pickup only:
+                    </span>{" "}
+                    No delivery. If you prefer delivery, you may arrange and cover the Uber delivery fee
+                    and we’ll hand the order to the driver.
+                  </li>
+                </ul>
+
+                <p className="mt-4 text-sm" style={{ color: "var(--ink-soft)" }}>
+                  You will receive an SMS confirmation shortly.
                 </p>
               </div>
 

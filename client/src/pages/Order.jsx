@@ -58,12 +58,13 @@ const handleCheckout = async (e) => {
         packSize: l.packSize,
       }))
 
-    const res = await fetch("http://localhost:5000/api/payment/create-checkout-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ customer, items }),
-    })
+    const API_URL = import.meta.env.VITE_API_URL
 
+const res = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ customer, items }),
+})
     const data = await res.json()
     if (!res.ok) throw new Error(data?.error || "Checkout failed")
     if (!data?.url) throw new Error("No Stripe checkout URL returned")
