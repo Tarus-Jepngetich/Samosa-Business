@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import "./styles/theme.css";
+
+
+html, body, #root {
+  height: 100%;
+}
+@keyframes qtyPop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.qty-pop {
+  animation: qtyPop 180ms ease-out;
+}
+.card-hover {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+}
