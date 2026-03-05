@@ -3,6 +3,26 @@ const router = express.Router()
 const Order = require("../models/Order")
 const requireAdmin = require("../middleware/requireAdmin") // ✅ JWT middleware ONLY
 
+// ✅ Success page will call this:
+// GET /api/orders/by-session/cs_test_...
+router.get("/by-session/:sessionId", async (req, res) => {
+  try {
+    const { sessionId } = req.params
+
+    const order = await Order.findOne({ "stripe.sessionId": sessionId })
+    if (!order) {
+      return res.status(404).json({ message: "Order not found for this session." })
+    }
+
+    return res.json({ order })
+  } catch (err) {
+    console.error("by-session error:", err.message)
+    return res.status(500).json({ message: "Server error" })
+  }
+})
+
+
+
 // GET /api/orders?status=paid&pickedUp=false
 router.get("/", requireAdmin, async (req, res) => {
   try {

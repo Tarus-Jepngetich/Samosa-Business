@@ -27,6 +27,7 @@ app.use(express.json())
 app.use("/api/admin", require("./routes/adminAuth"))
 app.use("/api/payment", paymentRoutes)
 app.use("/api/orders", ordersRoutes)
+app.use("/api/orders", require("./routes/orders"))
 app.use("/api/webhook", stripeWebhookRoutes) // BEFORE express.json()
 app.use(express.json())
 
