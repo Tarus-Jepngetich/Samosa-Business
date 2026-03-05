@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 
-import Container from "../components/layout/Container"
+import Container from "../components/layout/container"
 import QuantityStepper from "../components/QuantityStepper"
 import CustomerForm from "../components/CustomerForm"
 import StripeButton from "../components/ui/StripeButton"
@@ -98,7 +98,8 @@ const res = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
             <p className="mt-2" style={{ color: "var(--ink-soft)" }}>
               Each item is sold in packs of 6.
             </p>
-
+           
+            
             <div className="mt-10 grid gap-8 md:grid-cols-[1.2fr_0.8fr]">
               {/* Products */}
               <section className="grid gap-4">

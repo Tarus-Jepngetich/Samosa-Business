@@ -26,7 +26,9 @@ app.use("/api/payment", paymentRoutes)
 app.use("/api/orders", ordersRoutes)
 app.use("/api/webhook", stripeWebhookRoutes) // BEFORE express.json()
 app.use(express.json())
-const PORT = process.env.PORT || 5000
+
+    const PORT = process.env.PORT || 5000
+app.listen(PORT, () => console.log(`Server running on ${PORT}`))
 
 async function startServer() {
   try {
@@ -34,9 +36,7 @@ async function startServer() {
 
     console.log("MongoDB connected ✅")
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`)
-    })
+  
 
   } catch (error) {
     console.error("MongoDB connection error:", error.message)

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import Container from "../components/layout/Container"
+import Container from "../components/layout/container"
 import { formatAUD } from "../utils/money"
 
 const API_URL = import.meta.env.VITE_API_URL

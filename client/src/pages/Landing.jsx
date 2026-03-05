@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import Container from "../components/layout/Container"
+import Container from "../components/layout/container"
 import samoImg from "../assets/samo.png"
 import { Link } from "react-router-dom"
 
