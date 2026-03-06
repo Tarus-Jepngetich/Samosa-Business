@@ -7,10 +7,11 @@ const orderWindow = require("../middleware/orderWindow")
 router.post("/create-checkout-session", orderWindow, async (req, res) => {
   try {
     const key = process.env.STRIPE_SECRET_KEY
-    if (!key) return res.status(500).json({ error: "STRIPE_SECRET_KEY missing" })
+    if (!key) {
+      return res.status(500).json({ error: "STRIPE_SECRET_KEY missing" })
+    }
 
     const stripe = Stripe(key)
-
     const { customer, items } = req.body
 
     if (!customer?.name || !customer?.phone) {
@@ -21,7 +22,7 @@ router.post("/create-checkout-session", orderWindow, async (req, res) => {
       return res.status(400).json({ error: "Items are required." })
     }
 
-    // Compute totals in cents (trust YOUR backend, not the frontend)
+    // Normalize + validate backend-side
     const normalizedItems = items.map((it) => {
       const unitPriceCents = Number(it.unitPriceCents)
       const quantity = Number(it.quantity)
@@ -30,6 +31,7 @@ router.post("/create-checkout-session", orderWindow, async (req, res) => {
       if (!Number.isFinite(unitPriceCents) || unitPriceCents <= 0) {
         throw new Error(`Invalid unitPriceCents for item: ${it?.name || "unknown"}`)
       }
+
       if (!Number.isFinite(quantity) || quantity <= 0) {
         throw new Error(`Invalid quantity for item: ${it?.name || "unknown"}`)
       }
@@ -38,7 +40,7 @@ router.post("/create-checkout-session", orderWindow, async (req, res) => {
 
       return {
         productId: it.productId || "",
-        name: it.name,
+        name: it.name || "Samosa Pack",
         unitPriceCents,
         quantity,
         packSize,
@@ -48,7 +50,7 @@ router.post("/create-checkout-session", orderWindow, async (req, res) => {
 
     const totalCents = normalizedItems.reduce((sum, it) => sum + it.lineTotalCents, 0)
 
-    // Create order first (you may prefer "pending" then confirm via webhook later)
+    // Create order first
     const order = await Order.create({
       customer: {
         name: customer.name.trim(),
@@ -60,6 +62,7 @@ router.post("/create-checkout-session", orderWindow, async (req, res) => {
       totalCents,
       status: "pending",
       pickedUp: false,
+      stripe: {},
     })
 
     const session = await stripe.checkout.sessions.create({
@@ -67,23 +70,27 @@ router.post("/create-checkout-session", orderWindow, async (req, res) => {
       line_items: normalizedItems.map((it) => ({
         price_data: {
           currency: "aud",
-          product_data: { name: it.name },
+          product_data: {
+            name: it.name,
+          },
           unit_amount: it.unitPriceCents,
         },
         quantity: it.quantity,
       })),
-      metadata: { orderId: String(order._id) },
+      metadata: {
+        orderId: String(order._id),
+      },
       success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/order`,
     })
 
-    // Save session id on the order
-    order.stripe = order.stripe || {}
+    // Save session id immediately for success-page lookup
     order.stripe.sessionId = session.id
     await order.save()
 
     return res.json({ url: session.url })
   } catch (err) {
+    console.error("create-checkout-session error:", err.message)
     return res.status(500).json({ error: err.message })
   }
 })
