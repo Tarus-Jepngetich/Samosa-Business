@@ -3,6 +3,8 @@ import { Link, useSearchParams } from "react-router-dom"
 import Container from "../components/layout/container"
 import { formatAUD } from "../utils/money"
 
+const API_BASE = import.meta.env.VITE_API_URL || ""
+
 export default function Success() {
   const [params] = useSearchParams()
   const sessionId = params.get("session_id")
@@ -19,10 +21,37 @@ export default function Success() {
         setLoading(true)
         setError("")
 
-        // ✅ Change this URL to your real endpoint:
-        // e.g. /api/orders/by-session/:sessionId
-        const res = await fetch(`/api/orders/by-session/${sessionId}`)
-        if (!res.ok) throw new Error(`Request failed (${res.status})`)
+        if (!sessionId) {
+          throw new Error("Missing session_id in the URL.")
+        }
+
+        const res = await fetch(`${API_BASE}/api/orders/by-session/${sessionId}`)
+        const contentType = res.headers.get("content-type") || ""
+
+        if (!res.ok) {
+          let message = `Request failed (${res.status})`
+
+          try {
+            if (contentType.includes("application/json")) {
+              const json = await res.json()
+              message = json?.message || json?.error || message
+            } else {
+              const text = await res.text()
+              if (text) message = text
+            }
+          } catch {
+            // keep fallback message
+          }
+
+          throw new Error(message)
+        }
+
+        if (!contentType.includes("application/json")) {
+          const text = await res.text()
+          throw new Error(
+            `Expected JSON but received HTML/text instead. Check your backend route or Vite proxy. ${text.slice(0, 80)}`
+          )
+        }
 
         const json = await res.json()
         if (alive) setData(json)
@@ -33,24 +62,18 @@ export default function Success() {
       }
     }
 
-    if (sessionId) load()
-    else {
-      setLoading(false)
-      setError("Missing session_id in the URL.")
-    }
+    load()
 
     return () => {
       alive = false
     }
   }, [sessionId])
 
-  // ✅ Works whether your backend returns {order: {...}} or just {...}
   const order = useMemo(() => {
     if (!data) return null
     return data.order ?? data
   }, [data])
 
-  // ✅ The “.name fix” — never crashes
   const customerName =
     order?.customer?.name ??
     order?.customerName ??
@@ -58,12 +81,15 @@ export default function Success() {
     order?.customer?.fullName ??
     "Customer"
 
-  const items = order?.items ?? order?.lineItems ?? []
+  const customerPhone = order?.customer?.phone ?? "—"
+  const customerPepper = order?.customer?.pepper ?? "—"
+  const customerNotes = order?.customer?.notes ?? ""
 
-  const total =
-    order?.total ??
-    order?.amountTotal ??
-    items.reduce((sum, it) => sum + (it?.price ?? 0) * (it?.qty ?? 1), 0)
+  const items = order?.items ?? []
+
+  const totalCents =
+    order?.totalCents ??
+    items.reduce((sum, it) => sum + (it?.lineTotalCents ?? 0), 0)
 
   return (
     <div className="min-h-screen bg-white">
@@ -71,11 +97,17 @@ export default function Success() {
         <Container>
           <div className="flex items-center justify-between py-6">
             <div>
-              <p className="text-xs tracking-[0.35em] uppercase" style={{ color: "var(--ink-soft)" }}>
+              <p
+                className="text-xs tracking-[0.35em] uppercase"
+                style={{ color: "var(--ink-soft)" }}
+              >
                 Payment Status
               </p>
-              <h1 className="text-2xl font-extrabold" style={{ color: "var(--ink)" }}>
-                {loading ? "Loading..." : error ? "Oops" : "Order confirmed"}
+              <h1
+                className="text-2xl font-extrabold"
+                style={{ color: "var(--ink)" }}
+              >
+                {loading ? "Loading..." : error ? "Couldn’t load your order" : "Order confirmed"}
               </h1>
             </div>
 
@@ -94,51 +126,116 @@ export default function Success() {
         <Container>
           <div className="py-10 md:py-12 space-y-6">
             {loading && (
-              <div className="rounded-3xl p-6" style={{ border: "1px solid var(--border)" }}>
-                <p style={{ color: "var(--ink-soft)" }}>Fetching your order details…</p>
+              <div
+                className="rounded-3xl p-6"
+                style={{ border: "1px solid var(--border)" }}
+              >
+                <p style={{ color: "var(--ink-soft)" }}>
+                  Fetching your order details…
+                </p>
               </div>
             )}
 
             {!loading && error && (
-              <div className="rounded-3xl p-6" style={{ border: "1px solid var(--border)" }}>
-                <p className="font-bold" style={{ color: "var(--ink)" }}>Couldn’t load your order</p>
-                <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>{error}</p>
+              <div
+                className="rounded-3xl p-6"
+                style={{ border: "1px solid var(--border)" }}
+              >
+                <p className="font-bold" style={{ color: "var(--ink)" }}>
+                  Couldn’t load your order
+                </p>
+                <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>
+                  {error}
+                </p>
                 <p className="mt-4 text-xs" style={{ color: "var(--ink-soft)" }}>
-                  Tip: check your backend route for this session_id: <span style={{ color: "var(--ink)" }}>{sessionId}</span>
+                  Tip: check your backend route for this session_id:{" "}
+                  <span style={{ color: "var(--ink)" }}>{sessionId || "—"}</span>
                 </p>
               </div>
             )}
 
             {!loading && !error && (
               <>
-                <div className="rounded-3xl p-6" style={{ border: "1px solid var(--border)" }}>
+                <div
+                  className="rounded-3xl p-6"
+                  style={{ border: "1px solid var(--border)" }}
+                >
                   <p className="text-sm" style={{ color: "var(--ink-soft)" }}>
-                    Thank you, <span style={{ color: "var(--ink)", fontWeight: 800 }}>{customerName}</span> ✅
+                    Thank you,{" "}
+                    <span style={{ color: "var(--ink)", fontWeight: 800 }}>
+                      {customerName}
+                    </span>{" "}
+                    ✅
                   </p>
                   <p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>
-                    We’ve received your order. Pickup details will be shown on the homepage.
+                    We’ve received your order successfully.
                   </p>
                 </div>
 
-                <div className="rounded-3xl p-6" style={{ border: "1px solid var(--border)" }}>
-                  <p className="font-extrabold" style={{ color: "var(--ink)" }}>Order summary</p>
+                <div
+                  className="rounded-3xl p-6"
+                  style={{ border: "1px solid var(--border)" }}
+                >
+                  <p
+                    className="font-extrabold text-lg"
+                    style={{ color: "var(--ink)" }}
+                  >
+                    Order summary
+                  </p>
 
-                  <ul className="mt-4 space-y-2">
-                    {(items ?? []).map((it, idx) => {
+                  <div className="mt-4 space-y-2 text-sm" style={{ color: "var(--ink-soft)" }}>
+                    <p>
+                      <span style={{ color: "var(--ink)", fontWeight: 700 }}>Name:</span>{" "}
+                      {customerName}
+                    </p>
+                    <p>
+                      <span style={{ color: "var(--ink)", fontWeight: 700 }}>Phone:</span>{" "}
+                      {customerPhone}
+                    </p>
+                    <p>
+                      <span style={{ color: "var(--ink)", fontWeight: 700 }}>Pepper:</span>{" "}
+                      {customerPepper}
+                    </p>
+                    {customerNotes ? (
+                      <p>
+                        <span style={{ color: "var(--ink)", fontWeight: 700 }}>Notes:</span>{" "}
+                        {customerNotes}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <ul className="mt-6 space-y-3">
+                    {items.map((it, idx) => {
                       const name = it?.name ?? it?.product?.name ?? "Item"
-                      const qty = it?.qty ?? it?.quantity ?? 1
+                      const qty = it?.quantity ?? it?.qty ?? 1
+                      const lineTotal = it?.lineTotalCents ?? 0
+
                       return (
-                        <li key={it?._id ?? it?.id ?? idx} className="text-sm" style={{ color: "var(--ink-soft)" }}>
-                          <span style={{ color: "var(--ink)", fontWeight: 700 }}>{name}</span> × {qty}
+                        <li
+                          key={it?._id ?? it?.productId ?? idx}
+                          className="flex items-center justify-between text-sm"
+                          style={{ color: "var(--ink-soft)" }}
+                        >
+                          <span>
+                            <span style={{ color: "var(--ink)", fontWeight: 700 }}>
+                              {name}
+                            </span>{" "}
+                            × {qty}
+                          </span>
+                          <span style={{ color: "var(--ink)", fontWeight: 700 }}>
+                            {formatAUD(lineTotal / 100)}
+                          </span>
                         </li>
                       )
                     })}
                   </ul>
 
-                  <div className="mt-6 flex items-center justify-between">
-                    <span className="text-sm font-bold" style={{ color: "var(--ink-soft)" }}>Total</span>
+                  <div className="mt-6 flex items-center justify-between border-t pt-4" style={{ borderColor: "var(--border)" }}>
+                    <span className="text-sm font-bold" style={{ color: "var(--ink-soft)" }}>
+                      Total
+                    </span>
                     <span className="text-lg font-extrabold" style={{ color: "var(--ink)" }}>
-                      {formatAUD(Number(total || 0))}
+                      {formatAUD(totalCents / 100)}
                     </span>
                   </div>
                 </div>
