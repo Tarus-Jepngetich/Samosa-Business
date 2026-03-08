@@ -5,7 +5,7 @@ const OrderSchema = new mongoose.Schema(
     customer: {
       name: { type: String, required: true },
       phone: { type: String, required: true },
-      pepper: { type: String, enum: ["no_pepper", "mild", "hot"], default: "mild" },
+      pepper: { type: String, enum: ["no_pepper", "mild", "hot"], default: "no_pepper" },
       notes: { type: String, default: "" },
     },
 

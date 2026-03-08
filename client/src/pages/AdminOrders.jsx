@@ -20,14 +20,14 @@ function startOfWeekMonday() {
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([])
-  const [status, setStatus] = useState("pending") // ✅ default pending
+  const [status, setStatus] = useState("pending") //  default pending
   const [pickedUp, setPickedUp] = useState("false")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [view, setView] = useState("pickup") // "pickup" | "table"
   const [query, setQuery] = useState("")
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [range, setRange] = useState("today") // ✅ "today" | "week" | "all"
+  const [range, setRange] = useState("today") //  "today" | "week" | "all"
 
   function logout() {
     localStorage.removeItem("admin_token")
@@ -329,7 +329,7 @@ export default function AdminOrders() {
                 </div>
 
                 <div className="ml-auto flex flex-wrap gap-2">
-                  {/* ✅ Date range toggle */}
+                  {/*  Date range toggle */}
                   <RangeButton id="today" label="Today" />
                   <RangeButton id="week" label="This week" />
                   <RangeButton id="all" label="All time" />
@@ -504,9 +504,7 @@ export default function AdminOrders() {
               </div>
             )}
 
-            <div className="text-xs" style={{ color: "var(--ink-soft)" }}>
-              Colors: amber = not picked up • green = picked up • red = cancelled
-            </div>
+            
           </div>
         </Container>
       </main>

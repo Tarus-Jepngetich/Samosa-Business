@@ -223,7 +223,7 @@ id="how-pickup-works"
     to="/admin/login"
     className="text-xs text-gray-400 hover:text-gray-600"
   >
-    © Samosa Shop · Admin
+    © Samosa Shop 
   </Link>
 </div>
       </main>
