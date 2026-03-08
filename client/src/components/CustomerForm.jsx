@@ -38,40 +38,42 @@ export default function CustomerForm({ customer, setCustomer }) {
             style={{ border: "1px solid var(--border)" }}
           />
         </label>
-<label className="grid gap-2">
-  <span className="text-sm" style={{ color: "var(--ink-soft)" }}>
-    Pepper level
-  </span>
 
-  <div className="grid grid-cols-3 gap-2">
-    {[
-      { key: "none", label: "No pepper" },
-      { key: "mild", label: "Mild" },
-      { key: "hot", label: "Hot" },
-    ].map((opt) => {
-      const active = customer.pepper === opt.key
-      return (
-        <button
-          key={opt.key}
-          type="button"
-          onClick={() => setCustomer((c) => ({ ...c, pepper: opt.key }))}
-          className="rounded-2xl px-3 py-3 text-sm font-semibold"
-          style={{
-            border: "1px solid var(--border)",
-            background: active ? "var(--ink)" : "white",
-            color: active ? "white" : "var(--ink)",
-          }}
-        >
-          {opt.label}
-        </button>
-      )
-    })}
-  </div>
+        <label className="grid gap-2">
+          <span className="text-sm" style={{ color: "var(--ink-soft)" }}>
+            Pepper level
+          </span>
 
-  <p className="text-xs" style={{ color: "var(--ink-soft)" }}>
-    Choose one option for the whole order.
-  </p>
-</label>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { key: "no_pepper", label: "No pepper" },
+              { key: "mild", label: "Mild" },
+              { key: "hot", label: "Hot" },
+            ].map((opt) => {
+              const active = customer.pepper === opt.key
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  onClick={() => setCustomer((c) => ({ ...c, pepper: opt.key }))}
+                  className="rounded-2xl px-3 py-3 text-sm font-semibold"
+                  style={{
+                    border: "1px solid var(--border)",
+                    background: active ? "var(--ink)" : "white",
+                    color: active ? "white" : "var(--ink)",
+                  }}
+                >
+                  {opt.label}
+                </button>
+              )
+            })}
+          </div>
+
+          <p className="text-xs" style={{ color: "var(--ink-soft)" }}>
+            Choose one option for the whole order.
+          </p>
+        </label>
+
         <label className="grid gap-2">
           <span className="text-sm" style={{ color: "var(--ink-soft)" }}>
             Notes (optional)

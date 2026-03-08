@@ -17,7 +17,7 @@ export default function Order() {
   const [cart, setCart] = useState(() =>
     Object.fromEntries(PRODUCTS.map((p) => [p.id, 0]))
   )
-  const [customer, setCustomer] = useState({ name: "", phone: "",  pepper: "mild", notes: "" })
+  const [customer, setCustomer] = useState({ name: "", phone: "",  pepper: "no_pepper", notes: "" })
 
   const lines = useMemo(() => {
     return PRODUCTS.map((p) => {
