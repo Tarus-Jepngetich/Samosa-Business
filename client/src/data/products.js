@@ -11,13 +11,13 @@ export const PRODUCTS = [
     name: "Chicken Samosas",
     description: "Mince Chicken + Vegetables",
     packSize: 6,
-    priceCents: 2500,
+    priceCents: 3000,
   },
   {
     id: "veg-6",
     name: "Veggie Samosas",
     description: "GreenGrams + Vegetables",
     packSize: 6,
-    priceCents: 2500,
+    priceCents: 2000,
   },
 ]
